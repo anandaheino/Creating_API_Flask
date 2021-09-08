@@ -4,7 +4,7 @@
 
 # pip install flask
 
-from flask import Flask
+from flask import Flask, request, Response
 
 # Creating a dict (same format as json) with some names, payment and positions
 employees = [
@@ -12,6 +12,21 @@ employees = [
                 {'name': 'Eny', 'position': 'Analist', 'pay':4000},
                 {'name': 'Mary', 'position': 'Developer', 'pay':5000},
              ]
+
+# security step: passing login and password to access the API
+# USERS: only users that are allowed to access the data
+users = [
+            {'username': 'Ananda', 'secret': '@admin1'},
+            {'username': 'Math', 'secret': '@admin2'}
+        ]
+# creating a method that authenticates the user:
+def check_user(username, secret):
+    for user in users:
+        if user['username'] == username and user['secret'] == secret:
+            return True
+        else:
+            return False
+
 
 app = Flask(__name__)
 
@@ -52,7 +67,33 @@ def get_employees_info(info, value):
             elif type(value_employee) == int:
                 if int(value) == value_employee:
                     out_employees.append(employee)
-    if out_employees
+    return {'employees': out_employees}
+
+# Using POST method at the decorator:
+@app.route('/informations', methods=['POST'])
+def get_employees_post():
+    username = request.form['username']
+    secret = request.form['secret']
+
+    # Checking if the user and password exist:
+    if not check_user(username, secret):
+        # 'Unauthorized 401 HTTP'
+        return Response('Unauthorized', status=401)
+
+    # the parameters will be inside the POST method now
+    info = request.form['info']
+    value = request.form['value']
+
+    out_employees = []
+    for employee in employees:
+        if info in employee.keys():
+            value_employee = employee[info]
+            if type(value_employee) == str:
+                if value.lower() == value_employee.lower():
+                    out_employees.append(employee)
+            elif type(value_employee) == int:
+                if int(value) == value_employee:
+                    out_employees.append(employee)
     return {'employees': out_employees}
 
 
