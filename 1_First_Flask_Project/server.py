@@ -31,7 +31,7 @@ def before_request():
 # this decorator says that it will execute the
 # function below with or without error
 @app.teardown_request
-def after_request():
+def after_request(exception):
     if g.conn is not None:
         g.conn.close()
         print('Closing database connection...')
@@ -54,7 +54,22 @@ def home():
 # This method passes the data from the employees when called
 @app.route("/employees")
 def get_employees():
-    return {'employees': employees}
+
+    query = """
+            SELECT name, position, pay
+            FROM employees;
+    """
+    # g.conn is always created in "after_request" function
+    cursor = g.conn.execute(query)
+    employers_dict = [
+                       {'name': row[0],
+                       'position': row[1],
+                       'pay': row[2]}
+            for row in cursor.fetchall()
+    ]
+
+    print(employers_dict)
+    return {'employees': employers_dict}
 
 
 # This method filters the position of the employees depending on the route passed at the URL
