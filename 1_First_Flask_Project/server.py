@@ -83,32 +83,33 @@ def get_employees():
 # This method filters the position of the employees depending on the route passed at the URL
 @app.route('/employees/<position>')
 def get_employees_position(position):
+    try:
+        query = f"""
+                    SELECT name, position, pay
+                    FROM employees
+                    WHERE "position" LIKE "{position}";
+            """
+        employers_dict = query_employers_to_dict(g.conn, query)
 
-    query = f"""
-                SELECT name, position, pay
-                FROM employees
-                WHERE "position" LIKE "{position}";
-        """
-    employers_dict = query_employers_to_dict(g.conn, query)
-
-    return {'employees': employers_dict}
-
+        return {'employees': employers_dict}
+    except:
+        print(f'Invalid position! Try something like {employers_dict["position"]}')
 
 # This last method filters the employees accordingly to some info from the dict
 # and a value (e.g. /position/analist)
 @app.route('/employees/<info>/<value>')
 def get_employees_info(info, value):
-    out_employees = []
-    for employee in employees:
-        if info in employee.keys():
-            value_employee = employee[info]
-            if type(value_employee) == str:
-                if value.lower() == value_employee.lower():
-                    out_employees.append(employee)
-            elif type(value_employee) == int:
-                if int(value) == value_employee:
-                    out_employees.append(employee)
-    return {'employees': out_employees}
+    try:
+        query = f"""
+                       SELECT name, position, pay
+                       FROM employees
+                       WHERE "{info}" LIKE "{value}";
+               """
+        employers_dict = query_employers_to_dict(g.conn, query)
+        return {'employees': employers_dict}
+    except:
+        print(f'Invalid information! Try something like: {employers_dict.keys()} with {employers_dict.values()}')
+
 
 
 # Using POST method at the decorator:
