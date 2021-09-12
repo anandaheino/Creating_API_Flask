@@ -143,6 +143,34 @@ def get_employees_post():
     return {'employees': employers_dict}
 
 
+@app.route('/register', methods=['POST'])
+def add_employees_post():
+    username = request.form['username']
+    secret = request.form['secret']
+
+    # Checking if the user and password exist:
+    if not check_user(username, secret):
+        # 'Unauthorized 401 HTTP'
+        return Response('Unauthorized', status=401)
+
+    # the employee's informations will be inside the POST method
+    name = request.form['name']
+    position = request.form['position']
+    pay = request.form['pay']
+
+    query = f"""
+               INSERT INTO employees (name, position, pay)
+               VALUES ("{name}", "{position}", "{pay}");
+            """
+    cursor = g.conn.cursor()
+    cursor.execute(query)
+
+    # to insert into the database we also need to commit:
+    g.conn.commit()
+
+    return {'employees': f"Successfully registered employee {name}!"}
+
+
 # This condition debugs, so we can edit and use without restarting the app
 if __name__ == "__main__":
     app.run(debug=True)
