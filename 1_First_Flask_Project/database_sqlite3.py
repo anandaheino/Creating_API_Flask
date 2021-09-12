@@ -17,7 +17,7 @@ cursor.execute("""
         CREATE TABLE employees (
             id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            position TEXT
+            position TEXT,
             pay REAL        
         );
 """)
