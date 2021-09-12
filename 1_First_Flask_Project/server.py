@@ -4,14 +4,13 @@
 
 # pip install flask
 
-from flask import Flask, request, Response
+from flask import Flask, request, Response, g
+import sqlite3
+# creating the app:
+app = Flask(__name__)
 
-# Creating a dict (same format as json) with some names, payment and positions
-employees = [
-                {'name': 'Val', 'position': 'Analist', 'pay':5000},
-                {'name': 'Eny', 'position': 'Analist', 'pay':4000},
-                {'name': 'Mary', 'position': 'Developer', 'pay':5000},
-             ]
+# path to the database:
+DB_URL = 'enterprise.db'
 
 # security step: passing login and password to access the API
 # USERS: only users that are allowed to access the data
@@ -19,6 +18,24 @@ users = [
             {'username': 'Ananda', 'secret': '@admin1'},
             {'username': 'Math', 'secret': '@admin2'}
         ]
+
+# Adding a flask decorator: before_request
+### This means that the first that will be
+### executed before any request if the function below!
+@app.before_request
+def before_request():
+    print('Connecting to the database...')
+    conn = sqlite3.connect(DB_URL)
+    g.conn = conn
+
+# this decorator says that it will execute the
+# function below with or without error
+@app.teardown_request
+def after_request():
+    if g.conn is not None:
+        g.conn.close()
+        print('Closing database connection...')
+
 # creating a method that authenticates the user:
 def check_user(username, secret):
     for user in users:
@@ -26,9 +43,6 @@ def check_user(username, secret):
             return True
         else:
             return False
-
-
-app = Flask(__name__)
 
 # To make the requisition, we use the decorator:
 @app.route("/")
