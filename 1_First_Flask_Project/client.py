@@ -2,7 +2,14 @@ import requests
 
 #### USING GET FROM REQUESTS:
 # adding the new get method with database connection
-response = requests.get('http://127.0.0.1:5000/employees')
+
+#### testing "get_employees"
+#response = requests.get('http://127.0.0.1:5000/employees')
+#### testing "get_employees_position"
+#response = requests.get('http://127.0.0.1:5000/employees/analyst')
+#### testing "get_employees_info"
+response = requests.get('http://127.0.0.1:5000/employees/name/mary')
+
 
 #print(response)
 # This response is: <[200]> which tells us that the request worked
