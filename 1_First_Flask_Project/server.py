@@ -34,7 +34,22 @@ def before_request():
 def after_request(exception):
     if g.conn is not None:
         g.conn.close()
-        print('Closing database connection...')
+        print('Closing database connection.')
+
+def query_employers_to_dict(conn, query):
+    # creating a cursor with conn passed to the function
+    cursor = conn.cursor()
+    # call cursor and execute the query
+    cursor.execute(query)
+    # transform cursor info into dict()
+    employers_dict = [
+            {'name': row[0],
+             'position': row[1],
+             'pay': row[2]}
+        for row in cursor.fetchall()
+    ]
+    return employers_dict
+
 
 # creating a method that authenticates the user:
 def check_user(username, secret):
@@ -59,16 +74,9 @@ def get_employees():
             SELECT name, position, pay
             FROM employees;
     """
-    # g.conn is always created in "after_request" function
-    cursor = g.conn.execute(query)
-    employers_dict = [
-                       {'name': row[0],
-                       'position': row[1],
-                       'pay': row[2]}
-            for row in cursor.fetchall()
-    ]
+    # using the function query emp to dict passing the connection and the query
+    employers_dict = query_employers_to_dict(g.conn, query)
 
-    print(employers_dict)
     return {'employees': employers_dict}
 
 
@@ -97,6 +105,7 @@ def get_employees_info(info, value):
                 if int(value) == value_employee:
                     out_employees.append(employee)
     return {'employees': out_employees}
+
 
 # Using POST method at the decorator:
 @app.route('/informations', methods=['POST'])
