@@ -83,11 +83,15 @@ def get_employees():
 # This method filters the position of the employees depending on the route passed at the URL
 @app.route('/employees/<position>')
 def get_employees_position(position):
-    out_employees = []
-    for employee in employees:
-        if position.lower() == employee['position'].lower():
-            out_employees.append(employee)
-    return {'employees': out_employees}
+
+    query = f"""
+                SELECT name, position, pay
+                FROM employees
+                WHERE "position" LIKE "{position}";
+        """
+    employers_dict = query_employers_to_dict(g.conn, query)
+
+    return {'employees': employers_dict}
 
 
 # This last method filters the employees accordingly to some info from the dict
