@@ -1,8 +1,8 @@
 import sqlite3
 
 employees = [
-                {'name': 'Val', 'position': 'Analist', 'pay':5000},
-                {'name': 'Eny', 'position': 'Analist', 'pay':4000},
+                {'name': 'Val', 'position': 'Analyst', 'pay':5000},
+                {'name': 'Eny', 'position': 'Analyst', 'pay':4000},
                 {'name': 'Mary', 'position': 'Developer', 'pay':5000},
              ]
 # connection with the database
